@@ -1,10 +1,13 @@
 #!/bin/bash
-
+usage(){
+echo "Usage: $0 [name] [C/C++/Android] (package name)"
+}
 if [ "$1" != "" ]
 then
   export name="$1" 
 else
   echo "ARG-1:name not defined!"
+  usage
   exit 1
 fi
 
@@ -13,6 +16,7 @@ then
   export type="$2"
 else
   echo "ARG-2:type not defined!"
+  usage
   exit 1
 fi
 echo $0 $*
@@ -61,6 +65,7 @@ then
     export package="$3"
   else
     echo "ARG-3:package name not defined!"
+    usage
     exit 1
   fi
   mkdir -p $name/{res,keystore,src,assets}
@@ -137,6 +142,28 @@ then
   echo -e "\trm -rf bin" >> $name/Makefile
   echo -e "install:" >> $name/Makefile
   echo -e "\tadb install bin/\$(NAME).apk" >> $name/Makefile
+elif [ "$type" == "Java" ]
+then
+  mkdir -p $name/src
+  echo -e "JC=javac" > $name/Makefile
+  echo -e "JFLAG=" >> $name/Makefile
+  echo -e "SRCS=src/Main.java" >> $name/Makefile
+  echo >> $name/Makefile
+  echo -e "all: clean build" >> $name/Makefile
+  echo -e "build:" >> $name/Makefile
+  echo -e "\tmkdir -p build" >> $name/Makefile
+  echo -e "\t\$(JC) \$(JFLAG) \$(SRCS)" >> $name/Makefile
+  echo -e "\tmv src/*.class build/" >> $name/Makefile
+  echo -e "\techo \"#!/bin/sh\" > build/run.sh" >> $name/Makefile
+  echo -e "\techo \"java Main\" >> build/run.sh" >> $name/Makefile
+  echo -e "\tchmod 755 build/run.sh" >> $name/Makefile
+  echo -e "clean:" >> $name/Makefile
+  echo -e "\trm -rf build/" >> $name/Makefile
+  echo -e "public class Main{" > $name/src/Main.java
+  echo -e "\tpublic static void main(String[] args){" >> $name/src/Main.java
+  echo -e "\t\tSystem.out.println(\"Hello World\");" >> $name/src/Main.java
+  echo -e "\t}" >> $name/src/Main.java
+  echo -e "}" >> $name/src/Main.java
 else
 echo "Type not supported yet."
 fi
