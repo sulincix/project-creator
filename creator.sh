@@ -1,6 +1,6 @@
 #!/bin/bash
 usage(){
-echo "Usage: $0 [name] [C/C++/Android] (package name)"
+echo "Usage: $0 [name] [C/C++/Android/Java] (package name)"
 }
 if [ "$1" != "" ]
 then
