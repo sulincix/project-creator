@@ -148,12 +148,12 @@ then
   mkdir -p $name/src
   echo -e "JC=javac" > $name/Makefile
   echo -e "JFLAG=" >> $name/Makefile
-  echo -e "SRCS=src/Main.java" >> $name/Makefile
+  echo -e "SRC=src/" >> $name/Makefile
   echo >> $name/Makefile
   echo -e "all: clean build" >> $name/Makefile
   echo -e "build:" >> $name/Makefile
   echo -e "\tmkdir -p build" >> $name/Makefile
-  echo -e "\t\$(JC) \$(JFLAG) \$(SRCS)" >> $name/Makefile
+  echo -e "\t\$(JC) \$(JFLAG) \$(shell find \$(SRC) -name \"*.java\")" >> $name/Makefile
   echo -e "\tmv src/*.class build/" >> $name/Makefile
   echo -e "\techo \"#!/bin/sh\" > build/run.sh" >> $name/Makefile
   echo -e "\techo \"java Main\" >> build/run.sh" >> $name/Makefile
@@ -165,6 +165,27 @@ then
   echo -e "\t\tSystem.out.println(\"Hello World\");" >> $name/src/Main.java
   echo -e "\t}" >> $name/src/Main.java
   echo -e "}" >> $name/src/Main.java
+elif [ "$type" == "Python2" ]
+then
+  mkdir -p $name/src
+  echo -e "PC=python" > $name/Makefile
+  echo -e "PFLAG=-m py_compile" >> $name/Makefile
+  echo -e "SRC=src/" >> $name/Makefile
+  echo >> $name/Makefile
+  echo -e "all: clean build" >> $name/Makefile
+  echo -e "build:" >> $name/Makefile
+  echo -e "\tmkdir -p build" >> $name/Makefile
+  echo -e "\t\$(PC) \$(PFLAG) \$(shell find \$(SRC) -name \"*.py\")" >> $name/Makefile
+  echo -e "\tmv src/*.pyc build/" >> $name/Makefile
+  echo -e "\techo \"#!/bin/sh\" > build/run.sh" >> $name/Makefile
+  echo -e "\techo \"./Main.pyc\" >> build/run.sh" >> $name/Makefile
+  echo -e "\tchmod 755 build/*" >> $name/Makefile
+  echo -e "clean:" >> $name/Makefile
+  echo -e "\trm -rf build/" >> $name/Makefile
+  echo -e "class Main:" > $name/src/Main.py
+  echo -e "\tdef write(self):" >> $name/src/Main.py
+  echo -e "\t\tprint \"Hello World\"" >> $name/src/Main.py
+  echo -e "Main().write()" >> $name/src/Main.py
 else
 echo "Type not supported yet."
 fi
