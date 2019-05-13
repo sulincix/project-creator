@@ -1,11 +1,11 @@
 JC=javac
 JFLAG=
-SRCS=src/Main.java
+SRC=src/
 
 all: clean build
 build:
 	mkdir -p build
-	$(JC) $(JFLAG) $(SRCS)
+	$(JC) $(JFLAG) $(shell find $(SRC) -name "*.java")
 	mv src/*.class build/
 	echo "#!/bin/sh" > build/run.sh
 	echo "java Main" >> build/run.sh
