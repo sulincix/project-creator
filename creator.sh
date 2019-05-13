@@ -120,7 +120,7 @@ then
   echo -e "JAVAC=\$(JAVADIR)/javac" >> $name/Makefile
   echo -e "JARSIGNER=\$(JAVADIR)/jarsigner" >> $name/Makefile
   echo -e "" >> $name/Makefile
-  echo -e "SRC=$jdir/" >> $name/Makefile
+  echo -e "SRC=src/" >> $name/Makefile
   echo -e "NAME=$name" >> $name/Makefile
   echo -e "" >> $name/Makefile
   echo -e "STOREPASS=123456" >> $name/Makefile
@@ -129,8 +129,9 @@ then
   echo -e "all: clear build sign install" >> $name/Makefile
   echo -e "build:" >> $name/Makefile
   echo -e "\tmkdir bin" >> $name/Makefile
+  echo -e "\tmkdir gen" >> $name/Makefile
   echo -e "\t\$(AAPT) package -v -f -I \$(AJAR) -M \"AndroidManifest.xml\" -A \"assets\" -S \"res\" -m -J \"gen\" -F \"bin/resources.ap_\"" >> $name/Makefile
-  echo -e "\t\$(JAVAC) -classpath \$(AJAR) -sourcepath src -sourcepath gen -d bin \$(SRC)*.java" >> $name/Makefile
+  echo -e "\t\$(JAVAC) -classpath \$(AJAR) -sourcepath \$(SRC) -sourcepath gen -d bin \$(shell find \$(SRC) -name \"*.java\")" >> $name/Makefile
   echo -e "\t\$(ADX) --dex --output=bin/classes.dex bin" >> $name/Makefile
   echo -e "\tmv bin/resources.ap_ bin/\$(NAME).ap_" >> $name/Makefile
   echo -e "\tcd bin ; \$(AAPT) add \$(NAME).ap_ classes.dex" >> $name/Makefile
@@ -139,9 +140,9 @@ then
   echo -e "generate:" >> $name/Makefile
   echo -e "\tkeytool -genkey -noprompt -alias Alias -dname \"CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country\" -keystore keystore/key.keystore -storepass \$(STOREPASS) -keypass \$(KEYPASS) -validity 3650" >> $name/Makefile
   echo -e "clear:" >> $name/Makefile
-  echo -e "\trm -rf bin" >> $name/Makefile
+  echo -e "\trm -rf bin gen" >> $name/Makefile
   echo -e "install:" >> $name/Makefile
-  echo -e "\tadb install bin/\$(NAME).apk" >> $name/Makefile
+  echo -e "\tadb install -r bin/\$(NAME).apk" >> $name/Makefile
 elif [ "$type" == "Java" ]
 then
   mkdir -p $name/src

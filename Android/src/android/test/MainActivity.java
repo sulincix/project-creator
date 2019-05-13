@@ -1,4 +1,4 @@
-package org.droidtr.android;
+package android.test;
 
 import android.app.Activity;
 import android.os.Bundle;
