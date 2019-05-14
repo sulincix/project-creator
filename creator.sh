@@ -113,36 +113,53 @@ then
   echo -e "SDK=~/Android/Sdk" > $name/Makefile
   echo -e "TARGET=28" >> $name/Makefile
   echo -e "TOOL=28.0.3" >> $name/Makefile
-  echo -e "AJAR=\$(SDK)/platforms/android-\$(TARGET)/android.jar" >> $name/Makefile
-  echo -e "ADX=\$(SDK)/build-tools/\$(TOOL)/dx" >> $name/Makefile
-  echo -e "AAPT=\$(SDK)/build-tools/\$(TOOL)/aapt" >> $name/Makefile
   echo -e "JAVADIR=/usr/bin" >> $name/Makefile
+  echo -e "BUILDTOOLS=\$(SDK)/build-tools/\$(TOOL)" >> $name/Makefile
+  echo -e "AJAR=\$(SDK)/platforms/android-\$(TARGET)/android.jar" >> $name/Makefile
+  echo -e "ADX=\$(BUILDTOOLS)/dx" >> $name/Makefile
+  echo -e "AAPT=\$(BUILDTOOLS)/aapt" >> $name/Makefile
   echo -e "JAVAC=\$(JAVADIR)/javac" >> $name/Makefile
   echo -e "JARSIGNER=\$(JAVADIR)/jarsigner" >> $name/Makefile
+  echo -e "APKSIGNER=\$(BUILDTOOLS)/apksigner" >> $name/Makefile
+  echo -e "ZIPALIGN=\$(BUILDTOOLS)/zipalign" >> $name/Makefile
+  echo -e "KEYTOOL=\$(JAVADIR)/keytool" >> $name/Makefile
+  echo -e "ADB=\$(SDK)/platform-tools/adb" >> $name/Makefile
+  echo -e "" >> $name/Makefile
+  echo -e "KEYFILE=key.keystore" >> $name/Makefile
   echo -e "" >> $name/Makefile
   echo -e "SRC=src/" >> $name/Makefile
-  echo -e "NAME=$name" >> $name/Makefile
+  echo -e "NAME=app" >> $name/Makefile
   echo -e "" >> $name/Makefile
   echo -e "STOREPASS=123456" >> $name/Makefile
   echo -e "KEYPASS=123456" >> $name/Makefile
   echo -e "" >> $name/Makefile
-  echo -e "all: clear build sign install" >> $name/Makefile
+  echo -e "all: clear build zipalign sign" >> $name/Makefile
   echo -e "build:" >> $name/Makefile
   echo -e "\tmkdir bin" >> $name/Makefile
   echo -e "\tmkdir gen" >> $name/Makefile
-  echo -e "\t\$(AAPT) package -v -f -I \$(AJAR) -M \"AndroidManifest.xml\" -A \"assets\" -S \"res\" -m -J \"gen\" -F \"bin/resources.ap_\"" >> $name/Makefile
-  echo -e "\t\$(JAVAC) -classpath \$(AJAR) -sourcepath \$(SRC) -sourcepath gen -d bin \$(shell find \$(SRC) -name \"*.java\")" >> $name/Makefile
+  echo -e "\t\$(AAPT) package -v -f -I \$(AJAR) -M "AndroidManifest.xml" -A "assets" -S "res" -m -J "gen" -F "bin/resources.ap_"" >> $name/Makefile
+  echo -e "\t\$(JAVAC) -classpath \$(AJAR) -sourcepath \$(SRC) -sourcepath gen -d bin \$(shell find \$(SRC) -name "*.java")" >> $name/Makefile
   echo -e "\t\$(ADX) --dex --output=bin/classes.dex bin" >> $name/Makefile
   echo -e "\tmv bin/resources.ap_ bin/\$(NAME).ap_" >> $name/Makefile
   echo -e "\tcd bin ; \$(AAPT) add \$(NAME).ap_ classes.dex" >> $name/Makefile
+  echo -e "zipalign:" >> $name/Makefile
+  echo -e "\t\$(ZIPALIGN) -v -p 4 bin/\$(NAME).ap_ bin/\$(NAME)-aligned.ap_" >> $name/Makefile
+  echo -e "\tmv bin/\$(NAME)-aligned.ap_ bin/\$(NAME).ap_" >> $name/Makefile
+  echo -e "optimize:" >> $name/Makefile
+  echo -e "\toptipng -o7 \$(shell find res -name "*.png")" >> $name/Makefile
   echo -e "sign:" >> $name/Makefile
-  echo -e "\tjarsigner -keystore keystore/key.keystore -storepass \$(STOREPASS) -keypass \$(KEYPASS) -signedjar bin/\$(NAME).apk bin/\$(NAME).ap_ Alias" >> $name/Makefile
+  echo -e "\t\$(APKSIGNER) sign --ks \$(KEYFILE) --ks-key-alias Alias --ks-pass pass:\$(STOREPASS) --key-pass pass:\$(KEYPASS) --out bin/\$(NAME).apk bin/\$(NAME).ap_" >> $name/Makefile
+  echo -e "\trm -f bin/\$(NAME).ap_" >> $name/Makefile
+  echo -e "jarsign:" >> $name/Makefile
+  echo -e "\t\$(JARSIGNER) -keystore \$(KEYFILE) -storepass \$(STOREPASS) -keypass \$(KEYPASS) -signedjar bin/\$(NAME).apk bin/\$(NAME).ap_ Alias" >> $name/Makefile
+  echo -e "\trm -f bin/\$(NAME).ap_" >> $name/Makefile
   echo -e "generate:" >> $name/Makefile
-  echo -e "\tkeytool -genkey -noprompt -alias Alias -dname \"CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country\" -keystore keystore/key.keystore -storepass \$(STOREPASS) -keypass \$(KEYPASS) -validity 3650" >> $name/Makefile
+  echo -e "\trm -f \$(KEYFILE)" >> $name/Makefile
+  echo -e "\t\$(KEYTOOL) -genkey -noprompt -alias Alias -dname \"CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country\" -keystore \$(KEYFILE) -storepass \$(STOREPASS) -keypass \$(KEYPASS) -validity 3650" >> $name/Makefile
   echo -e "clear:" >> $name/Makefile
   echo -e "\trm -rf bin gen" >> $name/Makefile
   echo -e "install:" >> $name/Makefile
-  echo -e "\tadb install -r bin/\$(NAME).apk" >> $name/Makefile
+  echo -e "\t\$(ADB) install -r bin/\$(NAME).apk" >> $name/Makefile
 elif [ "$type" == "Java" ]
 then
   mkdir -p $name/src
