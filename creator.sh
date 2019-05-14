@@ -113,7 +113,7 @@ then
   echo -e "SDK=~/Android/Sdk" > $name/Makefile
   echo -e "TARGET=28" >> $name/Makefile
   echo -e "TOOL=28.0.3" >> $name/Makefile
-  echo -e "JAVADIR=/usr/bin" >> $name/Makefile
+  echo -e "JAVADIR=\$(JAVA_HOME)/bin" >> $name/Makefile
   echo -e "BUILDTOOLS=\$(SDK)/build-tools/\$(TOOL)" >> $name/Makefile
   echo -e "AJAR=\$(SDK)/platforms/android-\$(TARGET)/android.jar" >> $name/Makefile
   echo -e "ADX=\$(BUILDTOOLS)/dx" >> $name/Makefile
@@ -163,7 +163,7 @@ then
 elif [ "$type" == "Java" ]
 then
   mkdir -p $name/src
-  echo -e "JC=javac" > $name/Makefile
+  echo -e "JC=\$(JAVA_HOME)/bin/javac" > $name/Makefile
   echo -e "JFLAG=" >> $name/Makefile
   echo -e "SRC=src/" >> $name/Makefile
   echo >> $name/Makefile

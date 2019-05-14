@@ -1,4 +1,4 @@
-JC=javac
+JC=$(JAVA_HOME)/bin/javac
 JFLAG=
 SRC=src/
 
