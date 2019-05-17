@@ -22,10 +22,12 @@ fi
 echo $0 $*
 if [ "$type" == "C" ]
 then
-  mkdir -p $name/src
+  mkdir -p $name/{src,res}
+  #building makefile
   echo -e "CC=gcc" > $name/Makefile
   echo -e "CFLAG=-Isrc -O3 -o" >> $name/Makefile
   echo -e "OUT=build/$name" >> $name/Makefile
+ echo -e "NAME=\"$name\"" >> $name/Makefile
   echo >> $name/Makefile
   echo -e "all: clean build" >> $name/Makefile
   echo -e "build:" >> $name/Makefile
@@ -33,6 +35,10 @@ then
   echo -e "\t\$(CC) \$(CFLAG) \$(OUT) src/main.c" >> $name/Makefile
   echo -e "clean:" >> $name/Makefile
   echo -e "\trm -rf build/" >> $name/Makefile
+  echo -e "install:" >> $name/Makefile
+  echo -e "\tcp -prfv res/* \$(TARGET)/" >> $name/Makefile
+  echo -e "\tinstall \$(OUT) \$(TARGET)/usr/bin/\$(NAME)" >> $name/Makefile
+  #building main.c
   echo -e "#include <stdio.h>" > $name/src/main.c
   echo -e "" >> $name/src/main.c
   echo -e "int main(int argc,char* argv[]){" >> $name/src/main.c
@@ -41,10 +47,12 @@ then
   echo -e "}" >> $name/src/main.c
 elif [ "$type" == "C++" ]
 then
-  mkdir -p $name/src
+  mkdir -p $name/{src,res}
+  #building makefile
   echo -e "CC=g++" > $name/Makefile
   echo -e "CFLAG=-Isrc -O3 -o" >> $name/Makefile
   echo -e "OUT=build/$name" >> $name/Makefile
+  echo -e "NAME=\"$name\"" >> $name/Makefile
   echo >> $name/Makefile
   echo -e "all: clean build" >> $name/Makefile
   echo -e "build:" >> $name/Makefile
@@ -52,6 +60,10 @@ then
   echo -e "\t\$(CC) \$(CFLAG) \$(OUT) src/main.cpp" >> $name/Makefile
   echo -e "clean:" >> $name/Makefile
   echo -e "\trm -rf build/" >> $name/Makefile
+  echo -e "install:" >> $name/Makefile
+  echo -e "\tcp -prfv res/* \$(TARGET)/" >> $name/Makefile
+  echo -e "\tinstall \$(OUT) \$(TARGET)/usr/bin/\$(NAME)" >> $name/Makefile
+  #building main.cpp
   echo -e "#include <iostream>" > $name/src/main.cpp
   echo -e "" >> $name/src/main.cpp
   echo -e "int main(int argc,char* argv[]){" >> $name/src/main.cpp
@@ -110,70 +122,72 @@ then
   echo -e "" >> $name/$jdir/MainActivity.java
   echo -e "}" >> $name/$jdir/MainActivity.java
   #building makefile
-   echo -e "SDK=~/Android/Sdk" > $name/Makefile
-   echo -e "TARGET=28" >> $name/Makefile
-   echo -e "TOOL=28.0.3" >> $name/Makefile
-   echo -e "JAVADIR=\$(JAVA_HOME)/bin" >> $name/Makefile
-   echo -e "BUILDTOOLS=\$(SDK)/build-tools/\$(TOOL)" >> $name/Makefile
-   echo -e "AJAR=\$(SDK)/platforms/android-\$(TARGET)/android.jar" >> $name/Makefile
-   echo -e "ADX=\$(BUILDTOOLS)/dx" >> $name/Makefile
-   echo -e "AAPT=\$(BUILDTOOLS)/aapt" >> $name/Makefile
-   echo -e "JAVAC=\$(JAVADIR)/javac" >> $name/Makefile
-   echo -e "JARSIGNER=\$(JAVADIR)/jarsigner" >> $name/Makefile
-   echo -e "APKSIGNER=\$(BUILDTOOLS)/apksigner" >> $name/Makefile
-   echo -e "ZIPALIGN=\$(BUILDTOOLS)/zipalign" >> $name/Makefile
-   echo -e "KEYTOOL=\$(JAVADIR)/keytool" >> $name/Makefile
-   echo -e "ADB=\$(SDK)/platform-tools/adb" >> $name/Makefile
-   echo -e "FAIDL=\$(SDK)/platforms/android-\$(TARGET)/framework.aidl" >> $name/Makefile
-   echo -e "AIDL=AAPT=\$(BUILDTOOLS)/aidl" >> $name/Makefile
-   echo -e "CLASSPATH=\$(AJAR):\$(shell echo \$(ls include 2> /dev/null) | sed "s/ /:/g")" >> $name/Makefile
-   echo -e "" >> $name/Makefile
-   echo -e "SRC=src/" >> $name/Makefile
-   echo -e "NAME=\"$name\"" >> $name/Makefile
-   echo -e "" >> $name/Makefile
-   echo -e "KEYFILE=key.keystore" >> $name/Makefile
-   echo -e "KEYALIAS=Alias" >> $name/Makefile
-   echo -e "STOREPASS=123456" >> $name/Makefile
-   echo -e "KEYPASS=123456" >> $name/Makefile
-   echo -e "" >> $name/Makefile
-   echo -e "all: clear build zipalign sign install" >> $name/Makefile
-   echo -e "build:" >> $name/Makefile
-   echo -e "\tmkdir bin" >> $name/Makefile
-   echo -e "\tmkdir gen" >> $name/Makefile
-   echo -e "\t\$(AAPT) package -v -f -I \$(AJAR) -M \"AndroidManifest.xml\" -A \"assets\" -S \"res\" -m -J \"gen\" -F \"bin/resources.ap_\"" >> $name/Makefile
-   echo -e "\t\$(JAVAC) -classpath \$(CLASSPATH) -sourcepath \$(SRC) -sourcepath gen -d bin \$(shell find \$(SRC) -name \"*.java\")" >> $name/Makefile
-   echo -e "\t\$(ADX) --dex --output=bin/classes.dex bin" >> $name/Makefile
-   echo -e "\tmv bin/resources.ap_ bin/\$(NAME).ap_" >> $name/Makefile
-   echo -e "\tcd bin ; \$(AAPT) add \$(NAME).ap_ classes.dex" >> $name/Makefile
-   echo -e "abuild:" >> $name/Makefile
-   echo -e "\tmkdir -p bin/aidl" >> $name/Makefile
-   echo -e "\t\$(AIDL) -Iaidl -p\$(FAIDL) -o bin/aidl \$(shell ls aidl | grep aidl$)" >> $name/Makefile
-   echo -e "\t\$(JAVAC) -classpath \$(CLASSPATH) -sourcepath bin/aidl -sourcepath gen -d bin \$(shell find bin/aidl -name "*.java")" >> $name/Makefile
-   echo -e "\trm -rf bin/aidl" >> $name/Makefile
-   echo -e "zipalign:" >> $name/Makefile
-   echo -e "\t\$(ZIPALIGN) -v -p 4 bin/\$(NAME).ap_ bin/\$(NAME)-aligned.ap_" >> $name/Makefile
-   echo -e "\tmv bin/\$(NAME)-aligned.ap_ bin/\$(NAME).ap_" >> $name/Makefile
-   echo -e "optimize:" >> $name/Makefile
-   echo -e "\toptipng -o7 \$(shell find res -name "*.png")" >> $name/Makefile
-   echo -e "sign:" >> $name/Makefile
-   echo -e "\t\$(APKSIGNER) sign --ks \$(KEYFILE) --ks-key-alias \$(KEYALIAS) --ks-pass pass:\$(STOREPASS) --key-pass pass:\$(KEYPASS) --out bin/\$(NAME).apk bin/\$(NAME).ap_" >> $name/Makefile
-   echo -e "\trm -f bin/\$(NAME).ap_" >> $name/Makefile
-   echo -e "jarsign:" >> $name/Makefile
-   echo -e "\t\$(JARSIGNER) -keystore \$(KEYFILE) -storepass \$(STOREPASS) -keypass \$(KEYPASS) -signedjar bin/\$(NAME).apk bin/\$(NAME).ap_ \$(KEYALIAS)" >> $name/Makefile
-   echo -e "\trm -f bin/\$(NAME).ap_" >> $name/Makefile
-   echo -e "generate:" >> $name/Makefile
-   echo -e "\trm -f \$(KEYFILE)" >> $name/Makefile
-   echo -e "\t\$(KEYTOOL) -genkey -noprompt -alias \$(KEYALIAS) -dname "CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country" -keystore \$(KEYFILE) -storepass \$(STOREPASS) -keypass \$(KEYPASS) -validity 3650" >> $name/Makefile
-   echo -e "clear:" >> $name/Makefile
-   echo -e "\trm -rf bin gen" >> $name/Makefile
-   echo -e "install:" >> $name/Makefile
-   echo -e "\t\$(ADB) install -r bin/\$(NAME).apk" >> $name/Makefile
+  echo -e "SDK=~/Android/Sdk" > $name/Makefile
+  echo -e "TARGET=28" >> $name/Makefile
+  echo -e "TOOL=28.0.3" >> $name/Makefile
+  echo -e "JAVADIR=\$(JAVA_HOME)/bin" >> $name/Makefile
+  echo -e "BUILDTOOLS=\$(SDK)/build-tools/\$(TOOL)" >> $name/Makefile
+  echo -e "AJAR=\$(SDK)/platforms/android-\$(TARGET)/android.jar" >> $name/Makefile
+  echo -e "ADX=\$(BUILDTOOLS)/dx" >> $name/Makefile
+  echo -e "AAPT=\$(BUILDTOOLS)/aapt" >> $name/Makefile
+  echo -e "JAVAC=\$(JAVADIR)/javac" >> $name/Makefile
+  echo -e "JARSIGNER=\$(JAVADIR)/jarsigner" >> $name/Makefile
+  echo -e "APKSIGNER=\$(BUILDTOOLS)/apksigner" >> $name/Makefile
+  echo -e "ZIPALIGN=\$(BUILDTOOLS)/zipalign" >> $name/Makefile
+  echo -e "KEYTOOL=\$(JAVADIR)/keytool" >> $name/Makefile
+  echo -e "ADB=\$(SDK)/platform-tools/adb" >> $name/Makefile
+  echo -e "FAIDL=\$(SDK)/platforms/android-\$(TARGET)/framework.aidl" >> $name/Makefile
+  echo -e "AIDL=AAPT=\$(BUILDTOOLS)/aidl" >> $name/Makefile
+  echo -e "CLASSPATH=\$(AJAR):\$(shell echo \$(ls include 2> /dev/null) | sed "s/ /:/g")" >> $name/Makefile
+  echo -e "" >> $name/Makefile
+  echo -e "SRC=src/" >> $name/Makefile
+  echo -e "NAME=\"$name\"" >> $name/Makefile
+  echo -e "" >> $name/Makefile
+  echo -e "KEYFILE=key.keystore" >> $name/Makefile
+  echo -e "KEYALIAS=Alias" >> $name/Makefile
+  echo -e "STOREPASS=123456" >> $name/Makefile
+  echo -e "KEYPASS=123456" >> $name/Makefile
+  echo -e "" >> $name/Makefile
+  echo -e "all: clear build zipalign sign install" >> $name/Makefile
+  echo -e "build:" >> $name/Makefile
+  echo -e "\tmkdir bin" >> $name/Makefile
+  echo -e "\tmkdir gen" >> $name/Makefile
+  echo -e "\t\$(AAPT) package -v -f -I \$(AJAR) -M \"AndroidManifest.xml\" -A \"assets\" -S \"res\" -m -J \"gen\" -F \"bin/resources.ap_\"" >> $name/Makefile
+  echo -e "\t\$(JAVAC) -classpath \$(CLASSPATH) -sourcepath \$(SRC) -sourcepath gen -d bin \$(shell find \$(SRC) -name \"*.java\")" >> $name/Makefile
+  echo -e "\t\$(ADX) --dex --output=bin/classes.dex bin" >> $name/Makefile
+  echo -e "\tmv bin/resources.ap_ bin/\$(NAME).ap_" >> $name/Makefile
+  echo -e "\tcd bin ; \$(AAPT) add \$(NAME).ap_ classes.dex" >> $name/Makefile
+  echo -e "abuild:" >> $name/Makefile
+  echo -e "\tmkdir -p bin/aidl" >> $name/Makefile
+  echo -e "\t\$(AIDL) -Iaidl -p\$(FAIDL) -o bin/aidl \$(shell ls aidl | grep aidl$)" >> $name/Makefile
+  echo -e "\t\$(JAVAC) -classpath \$(CLASSPATH) -sourcepath bin/aidl -sourcepath gen -d bin \$(shell find bin/aidl -name "*.java")" >> $name/Makefile
+  echo -e "\trm -rf bin/aidl" >> $name/Makefile
+  echo -e "zipalign:" >> $name/Makefile
+  echo -e "\t\$(ZIPALIGN) -v -p 4 bin/\$(NAME).ap_ bin/\$(NAME)-aligned.ap_" >> $name/Makefile
+  echo -e "\tmv bin/\$(NAME)-aligned.ap_ bin/\$(NAME).ap_" >> $name/Makefile
+  echo -e "optimize:" >> $name/Makefile
+  echo -e "\toptipng -o7 \$(shell find res -name "*.png")" >> $name/Makefile
+  echo -e "sign:" >> $name/Makefile
+  echo -e "\t\$(APKSIGNER) sign --ks \$(KEYFILE) --ks-key-alias \$(KEYALIAS) --ks-pass pass:\$(STOREPASS) --key-pass pass:\$(KEYPASS) --out bin/\$(NAME).apk bin/\$(NAME).ap_" >> $name/Makefile
+  echo -e "\trm -f bin/\$(NAME).ap_" >> $name/Makefile
+  echo -e "jarsign:" >> $name/Makefile
+  echo -e "\t\$(JARSIGNER) -keystore \$(KEYFILE) -storepass \$(STOREPASS) -keypass \$(KEYPASS) -signedjar bin/\$(NAME).apk bin/\$(NAME).ap_ \$(KEYALIAS)" >> $name/Makefile
+  echo -e "\trm -f bin/\$(NAME).ap_" >> $name/Makefile
+  echo -e "generate:" >> $name/Makefile
+  echo -e "\trm -f \$(KEYFILE)" >> $name/Makefile
+  echo -e "\t\$(KEYTOOL) -genkey -noprompt -alias \$(KEYALIAS) -dname "CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country" -keystore \$(KEYFILE) -storepass \$(STOREPASS) -keypass \$(KEYPASS) -validity 3650" >> $name/Makefile
+  echo -e "clear:" >> $name/Makefile
+  echo -e "\trm -rf bin gen" >> $name/Makefile
+  echo -e "install:" >> $name/Makefile
+  echo -e "\t\$(ADB) install -r bin/\$(NAME).apk" >> $name/Makefile
 elif [ "$type" == "Java" ]
 then
   mkdir -p $name/src
+  #building makefile
   echo -e "JC=\$(JAVA_HOME)/bin/javac" > $name/Makefile
   echo -e "JFLAG=" >> $name/Makefile
   echo -e "SRC=src/" >> $name/Makefile
+  echo -e "NAME=\"$name\"" >> $name/Makefile
   echo >> $name/Makefile
   echo -e "all: clean build" >> $name/Makefile
   echo -e "build:" >> $name/Makefile
@@ -185,6 +199,7 @@ then
   echo -e "\tchmod 755 build/run.sh" >> $name/Makefile
   echo -e "clean:" >> $name/Makefile
   echo -e "\trm -rf build/" >> $name/Makefile
+  #building main.java
   echo -e "public class Main{" > $name/src/Main.java
   echo -e "\tpublic static void main(String[] args){" >> $name/src/Main.java
   echo -e "\t\tSystem.out.println(\"Hello World\");" >> $name/src/Main.java
@@ -193,9 +208,11 @@ then
 elif [ "$type" == "Python2" ]
 then
   mkdir -p $name/src
+  #building makefile
   echo -e "PC=python" > $name/Makefile
   echo -e "PFLAG=-m py_compile" >> $name/Makefile
   echo -e "SRC=src/" >> $name/Makefile
+  echo -e "NAME=\"$name\"" >> $name/Makefile
   echo >> $name/Makefile
   echo -e "all: clean build" >> $name/Makefile
   echo -e "build:" >> $name/Makefile
@@ -207,6 +224,7 @@ then
   echo -e "\tchmod 755 build/*" >> $name/Makefile
   echo -e "clean:" >> $name/Makefile
   echo -e "\trm -rf build/" >> $name/Makefile
+  #buinding main.py
   echo -e "class Main:" > $name/src/Main.py
   echo -e "\tdef write(self):" >> $name/src/Main.py
   echo -e "\t\tprint \"Hello World\"" >> $name/src/Main.py

@@ -1,6 +1,7 @@
 JC=$(JAVA_HOME)/bin/javac
 JFLAG=
 SRC=src/
+NAME="Java"
 
 all: clean build
 build:

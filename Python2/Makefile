@@ -1,6 +1,7 @@
 PC=python
 PFLAG=-m py_compile
 SRC=src/
+NAME="Python2"
 
 all: clean build
 build:
