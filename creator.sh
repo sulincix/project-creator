@@ -1,6 +1,6 @@
 #!/bin/bash
 usage(){
-echo "Usage: $0 [name] [C/C++/Android/Java] (package name)"
+echo "Usage: $0 [name] [C/C++/Android/Java/Python2] (package name)"
 }
 if [ "$1" != "" ]
 then
@@ -175,7 +175,7 @@ then
   echo -e "\trm -f bin/\$(NAME).ap_" >> $name/Makefile
   echo -e "generate:" >> $name/Makefile
   echo -e "\trm -f \$(KEYFILE)" >> $name/Makefile
-  echo -e "\t\$(KEYTOOL) -genkey -noprompt -alias \$(KEYALIAS) -dname "CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country" -keystore \$(KEYFILE) -storepass \$(STOREPASS) -keypass \$(KEYPASS) -validity 3650" >> $name/Makefile
+  echo -e "\t\$(KEYTOOL) -genkey -noprompt -alias \$(KEYALIAS) -dname \"CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country\" -keystore \$(KEYFILE) -storepass \$(STOREPASS) -keypass \$(KEYPASS) -validity 3650" >> $name/Makefile
   echo -e "clear:" >> $name/Makefile
   echo -e "\trm -rf bin gen" >> $name/Makefile
   echo -e "install:" >> $name/Makefile

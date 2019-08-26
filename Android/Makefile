@@ -51,7 +51,7 @@ jarsign:
 	rm -f bin/$(NAME).ap_
 generate:
 	rm -f $(KEYFILE)
-	$(KEYTOOL) -genkey -noprompt -alias $(KEYALIAS) -dname CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country -keystore $(KEYFILE) -storepass $(STOREPASS) -keypass $(KEYPASS) -validity 3650
+	$(KEYTOOL) -genkey -noprompt -alias $(KEYALIAS) -dname "CN=Hostname, OU=OrganizationalUnit, O=Organization, L=City, S=State, C=Country" -keystore $(KEYFILE) -storepass $(STOREPASS) -keypass $(KEYPASS) -validity 3650
 clear:
 	rm -rf bin gen
 install:
