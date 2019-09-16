@@ -1,5 +1,5 @@
 JC=$(JAVA_HOME)/bin/javac
-JFLAG=
+JFLAG= -encoding UTF-8
 SRC=src/
 NAME="Java"
 

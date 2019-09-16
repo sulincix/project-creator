@@ -27,7 +27,7 @@ then
   echo -e "CC=gcc" > $name/Makefile
   echo -e "CFLAG=-Isrc -O3 -o" >> $name/Makefile
   echo -e "OUT=build/$name" >> $name/Makefile
- echo -e "NAME=\"$name\"" >> $name/Makefile
+  echo -e "NAME=\"$name\"" >> $name/Makefile
   echo >> $name/Makefile
   echo -e "all: clean build" >> $name/Makefile
   echo -e "build:" >> $name/Makefile
@@ -123,11 +123,11 @@ then
   echo -e "}" >> $name/$jdir/MainActivity.java
   #building makefile
   echo -e "SDK=~/Android/Sdk" > $name/Makefile
-  echo -e "TARGET=28" >> $name/Makefile
-  echo -e "TOOL=28.0.3" >> $name/Makefile
+  echo -e "TARGET=\$(shell ls \$(SDK)/platforms | sort | tail -n 1)" >> $name/Makefile
+  echo -e "TOOL=\$(shell ls \$(SDK)/build-tools | sort | tail -n 1)" >> $name/Makefile
   echo -e "JAVADIR=\$(JAVA_HOME)/bin" >> $name/Makefile
   echo -e "BUILDTOOLS=\$(SDK)/build-tools/\$(TOOL)" >> $name/Makefile
-  echo -e "AJAR=\$(SDK)/platforms/android-\$(TARGET)/android.jar" >> $name/Makefile
+  echo -e "AJAR=\$(SDK)/platforms/\$(TARGET)/android.jar" >> $name/Makefile
   echo -e "ADX=\$(BUILDTOOLS)/dx" >> $name/Makefile
   echo -e "AAPT=\$(BUILDTOOLS)/aapt" >> $name/Makefile
   echo -e "JAVAC=\$(JAVADIR)/javac" >> $name/Makefile
@@ -138,7 +138,7 @@ then
   echo -e "ADB=\$(SDK)/platform-tools/adb" >> $name/Makefile
   echo -e "FAIDL=\$(SDK)/platforms/android-\$(TARGET)/framework.aidl" >> $name/Makefile
   echo -e "AIDL=AAPT=\$(BUILDTOOLS)/aidl" >> $name/Makefile
-  echo -e "CLASSPATH=\$(AJAR):\$(shell echo \$(ls include 2> /dev/null) | sed "s/ /:/g")" >> $name/Makefile
+  echo -e "CLASSPATH=\$(AJAR):\$(shell echo \$(ls include 2> /dev/null) | sed \"s/ /:/g\")" >> $name/Makefile
   echo -e "" >> $name/Makefile
   echo -e "SRC=src/" >> $name/Makefile
   echo -e "NAME=\"$name\"" >> $name/Makefile
@@ -153,7 +153,7 @@ then
   echo -e "\tmkdir bin" >> $name/Makefile
   echo -e "\tmkdir gen" >> $name/Makefile
   echo -e "\t\$(AAPT) package -v -f -I \$(AJAR) -M \"AndroidManifest.xml\" -A \"assets\" -S \"res\" -m -J \"gen\" -F \"bin/resources.ap_\"" >> $name/Makefile
-  echo -e "\t\$(JAVAC) -classpath \$(CLASSPATH) -sourcepath \$(SRC) -sourcepath gen -d bin \$(shell find \$(SRC) -name \"*.java\")" >> $name/Makefile
+  echo -e "\t\$(JAVAC) -classpath \$(CLASSPATH) -encoding UTF-8 -sourcepath \$(SRC) -sourcepath gen -d bin \$(shell find \$(SRC) -name \"*.java\")" >> $name/Makefile
   echo -e "\t\$(ADX) --dex --output=bin/classes.dex bin" >> $name/Makefile
   echo -e "\tmv bin/resources.ap_ bin/\$(NAME).ap_" >> $name/Makefile
   echo -e "\tcd bin ; \$(AAPT) add \$(NAME).ap_ classes.dex" >> $name/Makefile
@@ -185,7 +185,7 @@ then
   mkdir -p $name/src
   #building makefile
   echo -e "JC=\$(JAVA_HOME)/bin/javac" > $name/Makefile
-  echo -e "JFLAG=" >> $name/Makefile
+  echo -e "JFLAG= -encoding UTF-8" >> $name/Makefile
   echo -e "SRC=src/" >> $name/Makefile
   echo -e "NAME=\"$name\"" >> $name/Makefile
   echo >> $name/Makefile

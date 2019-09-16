@@ -1,9 +1,9 @@
 SDK=~/Android/Sdk
-TARGET=28
-TOOL=28.0.3
+TARGET=$(shell ls $(SDK)/platforms | sort | tail -n 1)
+TOOL=$(shell ls $(SDK)/build-tools | sort | tail -n 1)
 JAVADIR=$(JAVA_HOME)/bin
 BUILDTOOLS=$(SDK)/build-tools/$(TOOL)
-AJAR=$(SDK)/platforms/android-$(TARGET)/android.jar
+AJAR=$(SDK)/platforms/$(TARGET)/android.jar
 ADX=$(BUILDTOOLS)/dx
 AAPT=$(BUILDTOOLS)/aapt
 JAVAC=$(JAVADIR)/javac
@@ -14,7 +14,7 @@ KEYTOOL=$(JAVADIR)/keytool
 ADB=$(SDK)/platform-tools/adb
 FAIDL=$(SDK)/platforms/android-$(TARGET)/framework.aidl
 AIDL=AAPT=$(BUILDTOOLS)/aidl
-CLASSPATH=$(AJAR):$(shell echo $(ls include 2> /dev/null) | sed s/ /:/g)
+CLASSPATH=$(AJAR):$(shell echo $(ls include 2> /dev/null) | sed "s/ /:/g")
 
 SRC=src/
 NAME="Android"
@@ -29,7 +29,7 @@ build:
 	mkdir bin
 	mkdir gen
 	$(AAPT) package -v -f -I $(AJAR) -M "AndroidManifest.xml" -A "assets" -S "res" -m -J "gen" -F "bin/resources.ap_"
-	$(JAVAC) -classpath $(CLASSPATH) -sourcepath $(SRC) -sourcepath gen -d bin $(shell find $(SRC) -name "*.java")
+	$(JAVAC) -classpath $(CLASSPATH) -encoding UTF-8 -sourcepath $(SRC) -sourcepath gen -d bin $(shell find $(SRC) -name "*.java")
 	$(ADX) --dex --output=bin/classes.dex bin
 	mv bin/resources.ap_ bin/$(NAME).ap_
 	cd bin ; $(AAPT) add $(NAME).ap_ classes.dex
