@@ -1,7 +1,7 @@
 PC=python3
 PFLAG=-m compileall
 SRC=src/
-NAME="Python2"
+NAME="Python3"
 
 all: clean build
 build:

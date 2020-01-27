@@ -1,6 +1,6 @@
 #!/bin/bash
 usage(){
-echo "Usage: $0 [name] [C/C++/Android/Java/Python2/Python3/vala] (package name)"
+echo -e "\033[31;1mUsage:\033[32;1m $0\033[33;1m [name]\033[34;1m [C/C++/Android/Java/Python2/Python3/Vala/Kmod]\033[35;1m (package name)\033[;0m"
 }
 if [ "$1" != "" ]
 then
@@ -289,7 +289,37 @@ then
   echo -e "static void main (string[] args){" > $name/src/main.vala
   echo -e "\tstdout.printf (\"Hello World!\\n\");" >> $name/src/main.vala
   echo -e "}" >> $name/src/main.vala
-
+elif [ "$type" == "Kmod" ]
+then
+	#building makefile
+	mkdir -p $name
+	echo -e "obj-m += $name.o" > $name/Makefile
+	echo -e "" >> $name/Makefile
+	echo -e "all:" >> $name/Makefile
+	echo -e "\tmake -C /lib/modules/\$(shell uname -r)/build M=\$(PWD) modules" >> $name/Makefile
+	echo -e "" >> $name/Makefile
+	echo -e "clean:" >> $name/Makefile
+	echo -e	"\techo -e make -C /lib/modules/\$(shell uname -r)/build M=\$(PWD) clean" >> $name/Makefile
+	#building module.c"
+	echo -e "#include <linux/module.h>" >$name/$name.c
+	echo -e "#include <linux/kernel.h>" >>$name/$name.c
+	echo -e "#include <linux/init.h>" >>$name/$name.c
+	echo -e "" >>$name/$name.c
+	echo -e "MODULE_LICENSE(\"GPL\");" >>$name/$name.c
+	echo -e "MODULE_AUTHOR(\"Your Name\");" >>$name/$name.c
+	echo -e "MODULE_DESCRIPTION(\"A Simple Kernel module\");" >>$name/$name.c
+	echo -e "" >>$name/$name.c
+	echo -e "static int __init "$name"_init(void){" >>$name/$name.c
+    echo -e "\tprintk(KERN_INFO \"Hello world!\\\n\");" >>$name/$name.c
+    echo -e "\treturn 0;" >>$name/$name.c
+	echo -e "}" >>$name/$name.c
+	echo -e "" >>$name/$name.c
+	echo -e "static void __exit "$name"_cleanup(void){" >>$name/$name.c
+    echo -e "\tprintk(KERN_INFO \"Cleaning up module.\\\n\");" >>$name/$name.c
+	echo -e "}" >>$name/$name.c
+	echo -e "" >>$name/$name.c
+	echo -e "module_init("$name"_init);" >>$name/$name.c
+	echo -e "module_exit("$name"_cleanup);" >>$name/$name.c
 else
 echo "Type not supported yet."
 fi
