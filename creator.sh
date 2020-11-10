@@ -1,6 +1,6 @@
 #!/bin/bash
 usage(){
-echo -e "\033[31;1mUsage:\033[32;1m $0\033[33;1m [name]\033[34;1m [C/C++/Android/Java/Python2/Python3/Vala/Kmod]\033[35;1m (package name)\033[;0m"
+echo -e "\033[31;1mUsage:\033[32;1m $0\033[33;1m [name]\033[34;1m [C/C++/Android/Java/Python2/Python3/Vala/Kmod/Debian]\033[35;1m (package name)\033[;0m"
 }
 if [ "$1" != "" ]
 then
@@ -320,6 +320,45 @@ then
 	echo -e "" >>$name/$name.c
 	echo -e "module_init("$name"_init);" >>$name/$name.c
 	echo -e "module_exit("$name"_cleanup);" >>$name/$name.c
+elif [ "$type" == "Debian" ]
+then
+	mkdir -p $name
+	cd $name
+	echo -e "build:" > Makefile
+	echo -e "\techo \"edit me\"" >> Makefile
+	echo -e "install:" >> Makefile
+	echo -e "\techo \"edit me\"" >> Makefile
+	mkdir -p debian
+	cd debian
+	echo -e "${name,,} (0.1.0) unstable; urgency=medium" > changelog
+	echo -e "" >> changelog
+	echo -e "  * Initial commit" >> changelog
+	echo -e "" >> changelog
+	echo -e " -- Your Name <your.email@example.org>  $(LANG=C date -R)" >> changelog
+	
+	echo 9 > compat
+
+	echo -e "Source: ${name,,}" > control
+	echo -e "Section: utils" >> control
+	echo -e "Priority: optional" >> control
+	echo -e "Maintainer: Your Name <your.email@example.org>" >> control
+	echo -e "Build-Depends: make" >> control
+	echo -e "Standards-Version: 4.3.0" >> control
+	echo -e "Homepage: https://example.org" >> control
+	echo -e "" >> control
+	echo -e "Package: ${name,,}" >> control
+	echo -e "Architecture: all" >> control
+	echo -e "Depends: \${misc:Depends}, libc6" >> control
+	echo -e "Description: Edit me" >> control
+	echo -e " Edit me. I am description" >> control
+
+	touch copyright
+
+	echo -e "#!/usr/bin/make -f" > rules
+	echo -e "" >> rules
+	echo -e "%:" >> rules
+	echo -e "\tdh \$@ " >> rules
+	cd ..
 else
 echo "Type not supported yet."
 fi
