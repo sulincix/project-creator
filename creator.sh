@@ -1,6 +1,6 @@
 #!/bin/bash
 usage(){
-echo -e "\033[31;1mUsage:\033[32;1m $0\033[33;1m [name]\033[34;1m [C/C++/Android/Java/Python2/Python3/Vala/Kmod/Debian]\033[35;1m (package name)\033[;0m"
+echo -e "\033[31;1mUsage:\033[32;1m $0\033[33;1m [name]\033[34;1m [C/C++/Android/Java/Python2/Python3/Vala/Kmod/Debian\Inary]\033[35;1m (package name)\033[;0m"
 }
 if [ "$1" != "" ]
 then
